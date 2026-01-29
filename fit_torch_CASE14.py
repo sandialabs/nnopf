@@ -7,27 +7,15 @@ import random
 from IPython import embed
 
 
-case_name = 'pglib_opf_case14_ieee'
+case_name = "pglib_opf_case14_ieee"
 
 # -------------------------
 # Dataset
 # -------------------------
-train_ds_full = OPFDataset(
-    root='data',
-    case_name=case_name,
-    split='train'
-)
-val_ds_full = OPFDataset(
-    root='data',
-    case_name=case_name,
-    split='val'
-)
+train_ds_full = OPFDataset(root="data", case_name=case_name, split="train")
+val_ds_full = OPFDataset(root="data", case_name=case_name, split="val")
 
-test_ds_full = OPFDataset(
-    root='data',
-    case_name=case_name,
-    split='test'
-)
+test_ds_full = OPFDataset(root="data", case_name=case_name, split="test")
 
 i = len(val_ds_full) // 100
 indices = random.sample(range(len(val_ds_full)), i)
@@ -47,6 +35,7 @@ training_loader = DataLoader(train_ds, batch_size=1, shuffle=True)
 val_loader = DataLoader(val_ds, batch_size=1, shuffle=False)
 test_loader = DataLoader(test_ds, batch_size=1, shuffle=False)
 
+
 # -------------------------
 # Helper: flatten inputs
 # -------------------------
@@ -57,7 +46,7 @@ def flatten_inputs(data):
     """
     xs = []
 
-    for node_type in ['load']:
+    for node_type in ["load"]:
         x = data.x_dict[node_type]
         xs.append(x.flatten())
 
@@ -70,11 +59,12 @@ def flatten_targets(data):
     """
     ys = []
 
-    for node_type in ['generator','bus']:
+    for node_type in ["generator", "bus"]:
         y = data.y_dict[node_type]
         ys.append(y.flatten())
 
     return torch.cat(ys, dim=0)
+
 
 # Infer input/output sizes
 sample = train_ds[0]
@@ -83,6 +73,7 @@ output_dim = flatten_targets(sample).numel()
 
 print(f"Input dim: {input_dim}")
 print(f"Output dim: {output_dim}")
+
 
 # -------------------------
 # Feed-Forward Model
@@ -95,7 +86,7 @@ class FFNN(nn.Module):
             nn.ReLU(),
             nn.Linear(200, 100),
             nn.ReLU(),
-            nn.Linear(100, output_dim)
+            nn.Linear(100, output_dim),
         )
 
     def forward(self, x):
@@ -104,6 +95,7 @@ class FFNN(nn.Module):
 
 model = FFNN(input_dim, output_dim)
 optimizer = torch.optim.Adam(model.parameters(), lr=1e-3)
+
 
 @torch.no_grad()
 def evaluate_loss(model, loader):
@@ -122,6 +114,7 @@ def evaluate_loss(model, loader):
     model.train()
     return total_loss / len(loader)
 
+
 # -------------------------
 # Training loop
 # -------------------------
@@ -129,7 +122,7 @@ def evaluate_loss(model, loader):
 train_losses = []
 val_losses = []
 
-best_val_loss = float('inf')
+best_val_loss = float("inf")
 best_state_dict = None
 
 model.train()
@@ -161,15 +154,10 @@ for epoch in range(num_epochs):
     # --- checkpoint best model ---
     if val_loss < best_val_loss:
         best_val_loss = val_loss
-        best_state_dict = {
-        k: v.detach().clone() for k, v in model.state_dict().items()
-        }
+        best_state_dict = {k: v.detach().clone() for k, v in model.state_dict().items()}
 
-    print(
-    f"Epoch {epoch:03d} | "
-    f"Train: {train_loss:.6f} | "
-    f"Val: {val_loss:.6f}"
-    )
+    print(f"Epoch {epoch:03d} | " f"Train: {train_loss:.6f} | " f"Val: {val_loss:.6f}")
+
 
 @torch.no_grad()
 def compute_r2(model, loader):
@@ -187,8 +175,8 @@ def compute_r2(model, loader):
         preds.append(pred)
         targets.append(y)
 
-    preds = torch.stack(preds) # [N, output_dim]
-    targets = torch.stack(targets) # [N, output_dim]
+    preds = torch.stack(preds)  # [N, output_dim]
+    targets = torch.stack(targets)  # [N, output_dim]
 
     # R² per output dimension
     ss_res = ((targets - preds) ** 2).sum(dim=0)
@@ -197,6 +185,8 @@ def compute_r2(model, loader):
     r2 = 1 - ss_res / ss_tot
 
     return r2
+
+
 @torch.no_grad()
 def compute_mse_per_output(model, loader):
     model.eval()
@@ -213,12 +203,13 @@ def compute_mse_per_output(model, loader):
         preds.append(pred)
         targets.append(y)
 
-    preds = torch.stack(preds) # [N, output_dim]
-    targets = torch.stack(targets) # [N, output_dim]
+    preds = torch.stack(preds)  # [N, output_dim]
+    targets = torch.stack(targets)  # [N, output_dim]
 
     mse_per_output = ((preds - targets) ** 2).mean(dim=0)
 
     return mse_per_output
+
 
 model.load_state_dict(best_state_dict)
 print(f"\nRestored best model (val MSE = {best_val_loss:.6f})")
@@ -234,55 +225,55 @@ for i, r in enumerate(r2):
 
 mse_per_output = compute_mse_per_output(model, test_loader)
 
-pg_MSE=[]
-qg_MSE=[]
-va_MSE=[]
-vm_MSE=[]
+pg_MSE = []
+qg_MSE = []
+va_MSE = []
+vm_MSE = []
 print("\nMSE per output:")
 for i, mse in enumerate(mse_per_output):
     print(f" Output {i:02d}: MSE = {mse.item():.6e}")
-    if i<10 and i % 2 ==0:
+    if i < 10 and i % 2 == 0:
         pg_MSE.append(mse.item())
-    elif i<10 and i % 2 !=0:
+    elif i < 10 and i % 2 != 0:
         qg_MSE.append(mse.item())
-    elif i>=10 and i % 2 ==0:
+    elif i >= 10 and i % 2 == 0:
         va_MSE.append(mse.item())
-    elif i>=10 and i % 2 !=0:
+    elif i >= 10 and i % 2 != 0:
         vm_MSE.append(mse.item())
 
-    
-#save_path = f"trained_models/ffnn_{case_name}_best.pt"
-#torch.save(model.state_dict(), save_path)
+
+# save_path = f"trained_models/ffnn_{case_name}_best.pt"
+# torch.save(model.state_dict(), save_path)
 print(val_losses)
 print(train_losses)
 
 
-#import plotly.graph_objects as go
+# import plotly.graph_objects as go
 
 # Create a figure
-#fig = go.Figure()
+# fig = go.Figure()
 
 # Add traces for training and validation losses
-#fig.add_trace(go.Scatter(x=list(range(len(train_losses))), y=train_losses, mode='lines', name='Train MSE'))
-#fig.add_trace(go.Scatter(x=list(range(len(val_losses))), y=val_losses, mode='lines', name='Val MSE'))
+# fig.add_trace(go.Scatter(x=list(range(len(train_losses))), y=train_losses, mode='lines', name='Train MSE'))
+# fig.add_trace(go.Scatter(x=list(range(len(val_losses))), y=val_losses, mode='lines', name='Val MSE'))
 
 # Update layout
-#fig.update_layout(
+# fig.update_layout(
 #    title=f'Training Curve ({case_name})',
 #    xaxis_title='Epoch',
 #    yaxis_title='MSE',
 #    legend_title='Legend',
 #    template='plotly_white'  # Optional: Use a white background
-#)
+# )
 
 # Show grid lines
-#fig.update_xaxes(showgrid=True)
-#fig.update_yaxes(showgrid=True)
+# fig.update_xaxes(showgrid=True)
+# fig.update_yaxes(showgrid=True)
 
 # Save the figure as a PNG file
-#fig.write_image('TRAINFIG.png')
+# fig.write_image('TRAINFIG.png')
 
 # Show the figure
-#fig.show()
+# fig.show()
 
 embed()
