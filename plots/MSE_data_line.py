@@ -2,7 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 ### PG (CASE 14) ######################################################################
-all_pg_MSE_14 = np.load("../all_pg_MSE_array_14_Gplus1.npy")
+all_pg_MSE_14 = np.load("../all_pg_MSE_array_14_Kplus1.npy")
 
 # verifying mean values match those in the table
 pg_MSE_mean_list_14 = []
@@ -23,7 +23,7 @@ pg_max_14 = np.max(unnested_all_pg_MSE_14)
 
 
 ### QG (CASE 14) ######################################################################
-all_qg_MSE_14 = np.load("../all_qg_MSE_array_14_Gplus1.npy")
+all_qg_MSE_14 = np.load("../all_qg_MSE_array_14_Kplus1.npy")
 
 # verifying mean values match those in the table
 qg_MSE_mean_list_14 = []
@@ -44,7 +44,7 @@ qg_max_14 = np.max(unnested_all_qg_MSE_14)
 
 
 ### VA (CASE 14) ######################################################################
-all_va_MSE_14 = np.load("../all_va_MSE_array_14_Gplus1.npy")
+all_va_MSE_14 = np.load("../all_va_MSE_array_14_Kplus1.npy")
 
 # verifying mean values match those in the table
 va_MSE_mean_list_14 = []
@@ -65,7 +65,7 @@ va_max_14 = np.max(unnested_all_va_MSE_14)
 
 
 ### VM (CASE 14) ######################################################################
-all_vm_MSE_14 = np.load("../all_vm_MSE_array_14_Gplus1.npy")
+all_vm_MSE_14 = np.load("../all_vm_MSE_array_14_Kplus1.npy")
 
 # verifying mean values match those in the table
 vm_MSE_mean_list_14 = []
@@ -86,7 +86,7 @@ vm_max_14 = np.max(unnested_all_vm_MSE_14)
 
 
 ### PG (CASE 30) ######################################################################
-all_pg_MSE_30 = np.load("../all_pg_MSE_array_30_Gplus1.npy")
+all_pg_MSE_30 = np.load("../all_pg_MSE_array_30_Kplus1.npy")
 
 # verifying mean values match those in the table
 pg_MSE_mean_list_30 = []
@@ -107,7 +107,7 @@ pg_max_30 = np.max(unnested_all_pg_MSE_30)
 
 
 ### QG (CASE 30) ######################################################################
-all_qg_MSE_30 = np.load("../all_qg_MSE_array_30_Gplus1.npy")
+all_qg_MSE_30 = np.load("../all_qg_MSE_array_30_Kplus1.npy")
 
 # verifying mean values match those in the table
 qg_MSE_mean_list_30 = []
@@ -128,7 +128,7 @@ qg_max_30 = np.max(unnested_all_qg_MSE_30)
 
 
 ### VA (CASE 30) ######################################################################
-all_va_MSE_30 = np.load("../all_va_MSE_array_30_Gplus1.npy")
+all_va_MSE_30 = np.load("../all_va_MSE_array_30_Kplus1.npy")
 
 # verifying mean values match those in the table
 va_MSE_mean_list_30 = []
@@ -149,7 +149,7 @@ va_max_30 = np.max(unnested_all_va_MSE_30)
 
 
 ### VM (CASE 30) ######################################################################
-all_vm_MSE_30 = np.load("../all_vm_MSE_array_30_Gplus1.npy")
+all_vm_MSE_30 = np.load("../all_vm_MSE_array_30_Kplus1.npy")
 
 # verifying mean values match those in the table
 vm_MSE_mean_list_30 = []
@@ -191,10 +191,10 @@ positions = np.array([0, 1, 2, 3, 4, 5, 6, 7])
 fig, ax = plt.subplots()
 bp = ax.bxp(stats, positions=positions, patch_artist=True)
 
-colors = ['lightblue', 'lightcoral',
-          'lightblue', 'lightcoral',
-          'lightblue', 'lightcoral',
-          'lightblue', 'lightcoral']
+colors = ['lightgreen', 'lightyellow',
+          'lightgreen', 'lightyellow',
+          'lightgreen', 'lightyellow',
+          'lightgreen', 'lightyellow',]
 
 for i, box in enumerate(bp['boxes']):
     box.set_facecolor(colors[i])
@@ -216,12 +216,12 @@ ax.set_ylabel('MSE')
 plt.grid(True)
 
 legend_labels = ['Case_14', 'Case_30']
-legend_colors = ['lightblue', 'lightcoral']
+legend_colors = ['lightgreen', 'lightyellow']
 handles = [plt.Line2D([0], [0], marker='o', color='w', label=label, 
                        markerfacecolor=color, markersize=10) for label, color in zip(legend_labels, legend_colors)]
 
 ax.legend(handles=handles, loc='upper right', bbox_to_anchor=(1.12, 1))
 
-plt.title('Mean Squared Error (MSE): Adding a Generator')
-plt.savefig(f'mse_gen.png')
+plt.title('Mean Squared Error (MSE): Adding a Line')
+plt.savefig(f'mse_line.png')
 plt.show()
