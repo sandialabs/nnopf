@@ -190,15 +190,18 @@ for i in range(2):
 positions = np.array([0, 1, 2, 3, 4, 5, 6, 7])
 
 fig, ax = plt.subplots()
-ax.bxp(stats, positions=positions, patch_artist=True)
+bp = ax.bxp(stats, positions=positions, patch_artist=True)
 
-colors = ['lightblue', 'lightgreen', 'lightcoral', 'lightyellow', 
-          'lightblue', 'lightgreen', 'lightcoral', 'lightyellow',
-          'lightblue', 'lightgreen', 'lightcoral', 'lightyellow',
-          'lightblue', 'lightgreen', 'lightcoral', 'lightyellow']
+colors = ['lightblue', 'lightcoral',
+          'lightblue', 'lightcoral',
+          'lightblue', 'lightcoral',
+          'lightblue', 'lightcoral']
 
-for i, box in enumerate(ax.artists):
+for i, box in enumerate(bp['boxes']):
     box.set_facecolor(colors[i])
+
+for median in bp['medians']:
+    median.set_color('black')
 
 ax.set_xticks([0.5, 2.5, 4.5, 6.5])  
 ax.set_xticklabels(['pg', 'qg', 'va', 'vm'])
@@ -207,7 +210,19 @@ for pos in [1.5, 3.5, 5.5]:
     ax.axvline(x=pos, color='black', linestyle='--', linewidth=1)
 
 plt.yscale('log')
+
+ax.set_xlabel('ACOPF Variables')
+ax.set_ylabel('MSE')
+
 plt.grid(True)
-plt.title('Mean Squared Error: Adding a Generator')
+
+legend_labels = ['Case_14', 'Case_30']
+legend_colors = ['lightblue', 'lightcoral']
+handles = [plt.Line2D([0], [0], marker='o', color='w', label=label, 
+                       markerfacecolor=color, markersize=10) for label, color in zip(legend_labels, legend_colors)]
+
+ax.legend(handles=handles, loc='upper right', bbox_to_anchor=(1.12, 1))
+
+plt.title('Mean Squared Error (MSE): Adding a Generator')
 plt.savefig(f'mse_gen.png')
 plt.show()
